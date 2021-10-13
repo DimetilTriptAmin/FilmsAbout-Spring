@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/FilmController")
+@RequestMapping(value = "api/Film")
 public class FilmController {
     private FilmService filmService;
 
@@ -19,7 +19,7 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @GetMapping(value = "/films")
+    @GetMapping(value = "/all")
     public @ResponseBody ResponseEntity GetFilms()
     {
         return new ResponseEntity<List<Film>>(filmService.FindAll(), HttpStatus.OK);
