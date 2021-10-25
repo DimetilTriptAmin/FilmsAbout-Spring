@@ -1,9 +1,8 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.business.dto.ServiceResponse;
-import by.karelin.business.services.FilmService;
+import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.business.services.interfaces.IFilmService;
 import by.karelin.domain.models.Film;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +12,9 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/Film")
 public class FilmController {
-    private FilmService filmService;
+    private IFilmService filmService;
 
-    public FilmController (FilmService filmService){
+    public FilmController (IFilmService filmService){
         this.filmService = filmService;
     }
 

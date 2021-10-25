@@ -7,7 +7,7 @@ import { axiosDefault } from "../../axios";
 export function* userRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/User`,
+    `https://localhost:8443/api/User`,
     "get",
     null,
     accessToken,
@@ -17,7 +17,7 @@ export function* userRequest(payload, accessToken) {
 export function* changePasswordRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/User/changePassword`,
+    `https://localhost:8443/api/User/changePassword`,
     "put",
     payload,
     accessToken,
@@ -27,7 +27,7 @@ export function* changePasswordRequest(payload, accessToken) {
 export function* logInRequest(payload) {
   const response = yield call(
     axiosDefault,
-    `https://localhost:8080/api/User/login`,
+    `https://localhost:8443/api/User/login`,
     "post",
     JSON.stringify(payload.values),
   );
@@ -39,7 +39,7 @@ export function* logInRequest(payload) {
 export function* updateRequest(payload, accessToken) {
   const response = yield call(
     axiosDefault,
-    `https://localhost:8080/api/User/update`,
+    `https://localhost:8443/api/User/update`,
     "put",
     JSON.stringify(payload),
     accessToken,
@@ -50,7 +50,7 @@ export function* updateRequest(payload, accessToken) {
 export function* registrationRequest(payload) {
   const response = yield call(
     axiosDefault,
-    `https://localhost:8080/api/User/register`,
+    `https://localhost:8443/api/User/register`,
     "post",
     JSON.stringify(payload.values),
   );
@@ -63,7 +63,7 @@ export function* logOutRequest(payload, accessToken) {
   yield window.localStorage.removeItem("accessToken");
   const response = yield call(
     axiosDefault,
-    `https://localhost:8080/api/User/logout`,
+    `https://localhost:8443/api/User/logout`,
     "delete",
     payload,
     accessToken,
@@ -75,7 +75,7 @@ export function* logOutRequest(payload, accessToken) {
 export function* currentFilmRatingRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Rating/getUserRating${payload}`,
+    `https://localhost:8443/api/Rating/getUserRating${payload}`,
     "get",
     null,
     accessToken,
@@ -89,7 +89,7 @@ export function* goToSettingsRequest(payload) {
 export function* setFilmRatingRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Rating/ratefilm`,
+    `https://localhost:8443/api/Rating/ratefilm`,
     "post",
     payload,
     accessToken,
@@ -103,7 +103,7 @@ export function* setFilmRatingRequest(payload, accessToken) {
 export function* commentListRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Comment/getAll${payload}`,
+    `https://localhost:8443/api/Comment/getAll${payload}`,
     "get",
   );
 }
@@ -111,7 +111,7 @@ export function* commentListRequest(payload) {
 export function* commentSubmitRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Comment/createComment`,
+    `https://localhost:8443/api/Comment/createComment`,
     "post",
     payload,
     accessToken,
@@ -121,7 +121,7 @@ export function* commentSubmitRequest(payload, accessToken) {
 export function* commentDeleteRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Comment/deleteComment/${payload}`,
+    `https://localhost:8443/api/Comment/deleteComment/${payload}`,
     "delete",
     null,
     accessToken,
@@ -133,13 +133,13 @@ export function* commentDeleteRequest(payload, accessToken) {
 //#region Film's call Methods
 
 export function* filmListRequest() {
-  return yield call(axiosDefault, `https://localhost:8080/api/Film/all`, "get");
+  return yield call(axiosDefault, `https://localhost:8443/api/Film/all`, "get");
 }
 
 export function* filmRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Film/${payload}`,
+    `https://localhost:8443/api/Film/${payload}`,
     "get",
   );
 }
@@ -147,7 +147,7 @@ export function* filmRequest(payload) {
 export function* filmIdRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Film/getId/${payload.replaceAll("-", " ")}`,
+    `https://localhost:8443/api/Film/getId/${payload.replaceAll("-", " ")}`,
     "get",
   );
 }
@@ -166,7 +166,7 @@ export function* goToFilmRequest(payload) {
 export function* getUserRatingRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8080/api/Rating/getUserRating?filmId=${payload.filmId}&userId=${payload.userId}`,
+    `https://localhost:8443/api/Rating/getUserRating?filmId=${payload.filmId}&userId=${payload.userId}`,
     "get",
   );
 }

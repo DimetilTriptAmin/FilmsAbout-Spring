@@ -17,6 +17,15 @@ public class Rating {
     @JoinColumn(name = "FILM_ID", referencedColumnName = "ID")
     private Film film;
 
+    //region ctors
+    public Rating(){}
+    public Rating(int rate, Film film, User user){
+        this.rate = rate;
+        this.film = film;
+        this.user = user;
+    }
+    //endregion
+
     //region getters&setters
 
     public Long getId() {

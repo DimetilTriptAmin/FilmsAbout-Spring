@@ -1,6 +1,7 @@
 package by.karelin.business.services;
 
-import by.karelin.business.dto.ServiceResponse;
+import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.business.services.interfaces.IFilmService;
 import by.karelin.domain.models.Film;
 import by.karelin.persistence.repositories.IFilmRepository;
 import org.springframework.data.domain.Example;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class FilmService {
+public class FilmService implements IFilmService {
     private IFilmRepository filmRepository;
 
     public FilmService(IFilmRepository filmRepository){

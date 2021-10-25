@@ -1,4 +1,4 @@
-package by.karelin.business.dto;
+package by.karelin.business.dto.Responses;
 
 
 import org.springframework.util.StringUtils;

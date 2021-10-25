@@ -20,6 +20,7 @@ public class Comment {
     private Film film;
 
     public Comment() {}
+    public Comment(User user, Film film, String text, Date date) {}
 
     //region getters&setters
 
