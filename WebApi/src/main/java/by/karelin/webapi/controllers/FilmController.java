@@ -1,6 +1,6 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.persistence.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.IFilmService;
 import by.karelin.domain.models.Film;
 import org.springframework.http.HttpStatus;
@@ -12,20 +12,20 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/Film")
 public class FilmController {
-    private IFilmService filmService;
+    private final IFilmService filmService;
 
     public FilmController (IFilmService filmService){
         this.filmService = filmService;
     }
 
     @GetMapping(value = "/all")
-    public @ResponseBody ResponseEntity GetFilms()
+    public @ResponseBody ResponseEntity getFilms()
     {
         return new ResponseEntity<List<Film>>(filmService.FindAll(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
-    public @ResponseBody ResponseEntity GetFilm(@PathVariable Long id)
+    public @ResponseBody ResponseEntity getFilm(@PathVariable Long id)
     {
         ServiceResponse<Film> response = filmService.GetById(id);
 
@@ -36,8 +36,8 @@ public class FilmController {
         return new ResponseEntity<Film>(response.getValue(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "getId/{title}")
-    public @ResponseBody ResponseEntity GetFilmIdAsync(@PathVariable String title)
+    @GetMapping(value = "id/{title}")
+    public @ResponseBody ResponseEntity getFilmIdAsync(@PathVariable String title)
     {
         ServiceResponse<Long> response = filmService.GetIdByTitle(title);
 

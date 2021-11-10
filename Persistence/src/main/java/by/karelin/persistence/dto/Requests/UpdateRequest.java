@@ -1,6 +1,6 @@
-package by.karelin.business.dto.Responses;
+package by.karelin.persistence.dto.Requests;
 
-public class UpdateResponse {
+public class UpdateRequest {
     private String avatar;
 
     public String getAvatar() {

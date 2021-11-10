@@ -1,9 +1,10 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.business.dto.Requests.SetRatingRequest;
-import by.karelin.business.dto.Responses.RatingResponse;
-import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.persistence.dto.Requests.SetRatingRequest;
+import by.karelin.persistence.dto.Responses.RatingResponse;
+import by.karelin.persistence.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.IRatingService;
+import by.karelin.business.utils.JwtProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,19 +12,23 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "api/Rating")
 public class RatingController {
-    private IRatingService ratingService;
+    private final IRatingService ratingService;
+    private final JwtProvider jwtProvider;
 
-    public RatingController(IRatingService ratingService) {
+    public RatingController(IRatingService ratingService, JwtProvider jwtProvider) {
         this.ratingService = ratingService;
+        this.jwtProvider = jwtProvider;
     }
 
-    @GetMapping(value="/getUserRating{filmId}")
-    public ResponseEntity GetUserRatingAsync(@PathVariable Long filmId) {
-        //TODO token
-        //var token = Request.Headers["Authorization"].ToString().Split()[Constants.TOKEN_VALUE_INDEX];
-        //var userId = _tokenDecoder.getUserIdFromToken(token);
-        Long userId = Long.MAX_VALUE;
-        ServiceResponse<RatingResponse> response = ratingService.GetUserRating(userId, filmId);
+    @GetMapping(value = "/{filmId}")
+    public ResponseEntity getUserRating(
+            @RequestHeader("Authorization") String rawToken,
+            @PathVariable Long filmId
+    ) {
+        String token = rawToken.substring("Bearer ".length());
+        Long userId = jwtProvider.getIdFromToken(token);
+
+        ServiceResponse<RatingResponse> response = ratingService.getUserRating(userId, filmId);
 
         if (!response.IsSucceeded()) {
             return new ResponseEntity(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
@@ -31,18 +36,18 @@ public class RatingController {
         return new ResponseEntity(response.getValue(), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/rateFilm")
-    public ResponseEntity RateFilmAsync(@RequestBody SetRatingRequest setRatingRequest)
-    {
-        //TODO token
-        //var token = Request.Headers["Authorization"].ToString().Split()[Constants.TOKEN_VALUE_INDEX];
-        //var userId = _tokenDecoder.getUserIdFromToken(token);
-        Long userId = Long.MAX_VALUE;
+    @PostMapping
+    public ResponseEntity rateFilm(
+            @RequestBody SetRatingRequest setRatingRequest,
+            @RequestHeader("Authorization") String rawToken
+    ) {
+        String token = rawToken.substring("Bearer ".length());
+        Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<Double> response =
-                ratingService.SetRating(setRatingRequest.getRate(), setRatingRequest.getFilmId(), userId);
+                ratingService.setRating(setRatingRequest.getRate(), setRatingRequest.getFilmId(), userId);
 
-        if (!response.IsSucceeded()){
+        if (!response.IsSucceeded()) {
             return new ResponseEntity(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(response.getValue(), HttpStatus.OK);

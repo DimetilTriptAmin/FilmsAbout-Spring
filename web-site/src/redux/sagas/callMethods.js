@@ -39,7 +39,7 @@ export function* logInRequest(payload) {
 export function* updateRequest(payload, accessToken) {
   const response = yield call(
     axiosDefault,
-    `https://localhost:8443/api/User/update`,
+    `https://localhost:8443/api/User/avatar`,
     "put",
     JSON.stringify(payload),
     accessToken,
@@ -75,7 +75,7 @@ export function* logOutRequest(payload, accessToken) {
 export function* currentFilmRatingRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Rating/getUserRating${payload}`,
+    `https://localhost:8443/api/Rating/${payload}`,
     "get",
     null,
     accessToken,
@@ -89,7 +89,7 @@ export function* goToSettingsRequest(payload) {
 export function* setFilmRatingRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Rating/ratefilm`,
+    `https://localhost:8443/api/Rating`,
     "post",
     payload,
     accessToken,
@@ -103,7 +103,7 @@ export function* setFilmRatingRequest(payload, accessToken) {
 export function* commentListRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Comment/getAll${payload}`,
+    `https://localhost:8443/api/Comment/all/${payload}`,
     "get",
   );
 }
@@ -111,7 +111,7 @@ export function* commentListRequest(payload) {
 export function* commentSubmitRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Comment/createComment`,
+    `https://localhost:8443/api/Comment`,
     "post",
     payload,
     accessToken,
@@ -121,7 +121,7 @@ export function* commentSubmitRequest(payload, accessToken) {
 export function* commentDeleteRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Comment/deleteComment/${payload}`,
+    `https://localhost:8443/api/Comment/${payload}`,
     "delete",
     null,
     accessToken,
@@ -147,7 +147,7 @@ export function* filmRequest(payload) {
 export function* filmIdRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Film/getId/${payload.replaceAll("-", " ")}`,
+    `https://localhost:8443/api/Film/id/${payload.replaceAll("-", " ")}`,
     "get",
   );
 }
@@ -166,7 +166,7 @@ export function* goToFilmRequest(payload) {
 export function* getUserRatingRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Rating/getUserRating?filmId=${payload.filmId}&userId=${payload.userId}`,
+    `https://localhost:8443/api/Rating/${payload.filmId}`,
     "get",
   );
 }

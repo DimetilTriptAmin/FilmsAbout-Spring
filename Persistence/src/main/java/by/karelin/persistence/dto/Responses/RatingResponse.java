@@ -1,4 +1,4 @@
-package by.karelin.business.dto.Responses;
+package by.karelin.persistence.dto.Responses;
 
 public class RatingResponse {
     private Long userId;

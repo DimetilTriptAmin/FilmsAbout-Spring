@@ -26,6 +26,8 @@ export const filmSlice = createSlice({
     FILM_ID_SUCCESS: (state, action) => {
       state.id = action.payload;
       state.idFetched = true;
+      state.isLoading = false;
+      state.Loaded = true;
     },
     FILM_FAILURE: (state, action) => {
       state.isLoading = false;

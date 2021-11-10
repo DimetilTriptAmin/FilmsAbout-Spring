@@ -1,4 +1,4 @@
-package by.karelin.business.dto.Requests;
+package by.karelin.persistence.dto.Requests;
 
 public class CreateCommentRequest {
     private Long filmId;

@@ -1,9 +1,10 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.business.dto.Requests.CreateCommentRequest;
-import by.karelin.business.dto.Responses.CommentResponse;
-import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.persistence.dto.Requests.CreateCommentRequest;
+import by.karelin.persistence.dto.Responses.CommentResponse;
+import by.karelin.persistence.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.ICommentService;
+import by.karelin.business.utils.JwtProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,16 +14,18 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "api/Comment")
 public class CommentController {
-    private ICommentService commentService;
+    private final ICommentService commentService;
+    private final JwtProvider jwtProvider;
 
-    public CommentController (ICommentService commentService){
+    public CommentController(ICommentService commentService, JwtProvider jwtProvider){
         this.commentService = commentService;
+        this.jwtProvider = jwtProvider;
     }
 
-    @GetMapping(value = "/getAll{filmId}")
+    @GetMapping(value = "/all/{filmId}")
     public ResponseEntity GetAllByFilmIdAsync(@PathVariable Long filmId)
     {
-        ServiceResponse<List<CommentResponse>> response = commentService.GetAllByFilmId(filmId);
+        ServiceResponse<List<CommentResponse>> response = commentService.getAllByFilmId(filmId);
 
         if (!response.IsSucceeded()) {
             return new ResponseEntity<>(response.getErrorMessage(), HttpStatus.NOT_FOUND);
@@ -31,16 +34,17 @@ public class CommentController {
         return new ResponseEntity<List<CommentResponse>>(response.getValue(), HttpStatus.OK);
     }
 
-    @PostMapping(value ="/createComment")
-    public ResponseEntity CreateCommentAsync(@RequestBody CreateCommentRequest request)
+    @PostMapping
+    public ResponseEntity CreateCommentAsync(
+            @RequestHeader("Authorization") String rawToken,
+            @RequestBody CreateCommentRequest request
+    )
     {
-        // TODO token
-        //var token = Request.Headers["Authorization"].ToString().Split()[Constants.TOKEN_VALUE_INDEX];
-        //var userId = _tokenDecoder.getUserIdFromToken(token);
-        Long userId = Long.MAX_VALUE;
+        String token = rawToken.substring("Bearer ".length());
+        Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<CommentResponse> response =
-                commentService.CreateComment(userId, request.getFilmId(), request.getText());
+                commentService.createComment(userId, request.getFilmId(), request.getText());
 
         if (!response.IsSucceeded()) {
             return new ResponseEntity<>(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
@@ -48,10 +52,10 @@ public class CommentController {
         return new ResponseEntity<CommentResponse>(response.getValue(), HttpStatus.OK);
     }
 
-    @DeleteMapping(value="/deleteComment/{id}")
+    @DeleteMapping(value="/{id}")
     public ResponseEntity DeleteCommentAsync(@PathVariable Long id)
     {
-        ServiceResponse<Long> response = commentService.DeleteComment(id);
+        ServiceResponse<Long> response = commentService.deleteComment(id);
 
         if (!response.IsSucceeded()) {
             return new ResponseEntity<>(response.getErrorMessage(), HttpStatus.BAD_REQUEST);

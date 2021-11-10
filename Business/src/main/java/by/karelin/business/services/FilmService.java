@@ -1,14 +1,12 @@
 package by.karelin.business.services;
 
-import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.persistence.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.IFilmService;
 import by.karelin.domain.models.Film;
-import by.karelin.persistence.repositories.IFilmRepository;
-import org.springframework.data.domain.Example;
+import by.karelin.persistence.repositories.interfaces.IFilmRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class FilmService implements IFilmService {
@@ -19,31 +17,28 @@ public class FilmService implements IFilmService {
     }
 
     public List<Film> FindAll() {
-        return filmRepository.findAll();
+        return filmRepository.getAll();
     }
 
     public ServiceResponse<Film> GetById(Long id) {
 
-        if (filmRepository.existsById(id)) {
-            Film film = filmRepository.getById(id);
-            return new ServiceResponse<Film>(film);
+        Film film = filmRepository.getById(id);
+
+        if (film == null) {
+            return new ServiceResponse<Film>("Film not found");
         }
 
-        return new ServiceResponse<Film>("Film not found");
+        return new ServiceResponse<Film>(film);
     }
 
     public ServiceResponse<Long> GetIdByTitle(String title) {
-        Film film = new Film();
-        film.setTitle(title);
+        Long film = filmRepository.getIdByTitle(title);
 
-        Example<Film> filmExample = Example.of(film);
-
-        Optional<Film> filmOptional = filmRepository.findAll(filmExample).stream().findFirst();
-
-        if(filmOptional.isEmpty()) {
-            return new ServiceResponse<>("Film not found");
+        if (film == null) {
+            return new ServiceResponse<Long>("Film not found");
         }
 
-        return new ServiceResponse<>(filmOptional.get().getId());
+        return new ServiceResponse<Long>(film);
     }
+
 }

@@ -16,23 +16,15 @@ const AppRouter = () => {
     <Router>
       <HeaderContainer />
       <Switch>
-        <Route exact path='/'>
-          <FilmCardListContainer />
-        </Route>
-        <Route path='/:title' component={FilmContainer} />
+        <Route exact path='/' component={FilmCardListContainer} />
+        <Route path='/login' component={LoginContainer} />
+        <Route path='/registration' component={RegistrationContainer} />
         <PrivateRoute path='/profile' component={UserSettingsContainer} />
-        <Route path='/login'>{<LoginContainer />}</Route>
-        <Route path='/registration'>
-          <RegistrationContainer />
-        </Route>
-        <Router path='*'>
-          <NotFound />
-        </Router>
+        <Route path='/:title' component={FilmContainer} />
+        <Router path='*' component={NotFound} />
       </Switch>
     </Router>
   );
 };
-
-AppRouter.propTypes = {};
 
 export default AppRouter;

@@ -1,9 +1,6 @@
 package by.karelin.domain.models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "FA_FILM")
@@ -13,6 +10,7 @@ public class Film {
     private Long id;
     private String title;
     private String poster;
+    private String producer;
     private String description;
     private String trailerLink;
     private double rating;
@@ -67,6 +65,14 @@ public class Film {
 
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public String getProducer() {
+        return producer;
+    }
+
+    public void setProducer(String producer) {
+        this.producer = producer;
     }
 
     //endregion

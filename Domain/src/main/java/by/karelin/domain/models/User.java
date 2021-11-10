@@ -1,7 +1,9 @@
 package by.karelin.domain.models;
 
+import org.hibernate.annotations.Type;
+import org.hibernate.dialect.OracleTypesHelper;
+
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "FA_USER")
@@ -11,12 +13,17 @@ public class User {
     private Long id;
     private String name;
     private String passwordHash;
+    @Lob
     private String avatar;
     private String email;
-    private Date birthDate;
-    private String refreshToken;
 
     public User() {}
+    public User(String name, String passwordHash, String avatar, String email){
+        this.name = name;
+        this.passwordHash = passwordHash;
+        this.avatar = avatar;
+        this.email = email;
+    }
 
     //region getters&setters
 
@@ -34,22 +41,6 @@ public class User {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
-    }
-
-    public Date getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
     }
 
     public String getName() {

@@ -54,7 +54,7 @@ const Search = ({
                   key={index}
                   onClick={onMenuItemClick}
                 >
-                  <Link to={`film${film.id}`} className={classes.link}>
+                  <Link to={film.title.replace(/\s+/g, "-").toLowerCase()} className={classes.link}>
                     <FilmShortcut
                       poster={film.poster}
                       title={film.title}

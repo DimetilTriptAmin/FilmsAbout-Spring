@@ -11,6 +11,7 @@ public class Comment {
     private Long id;
     private String text;
     private Date publishDate;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
@@ -20,7 +21,13 @@ public class Comment {
     private Film film;
 
     public Comment() {}
-    public Comment(User user, Film film, String text, Date date) {}
+    public Comment(User user, Film film, String text) {
+        this.user = user;
+        this.film = film;
+        this.text = text;
+        this.isDeleted = false;
+        publishDate = new Date();
+    }
 
     //region getters&setters
 
@@ -62,6 +69,14 @@ public class Comment {
 
     public void setFilm(by.karelin.domain.models.Film film) {
         this.film = film;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     //endregion

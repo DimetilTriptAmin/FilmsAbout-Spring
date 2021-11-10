@@ -11,10 +11,10 @@ const Login = ({ handleFormSubmit, isLoading }) => {
   const classes = useStyles();
 
   const validationSchema = Yup.object({
-    Username: Yup.string("Enter your username")
+    username: Yup.string("Enter your username")
       .min(2, "Username should be of minimum 2 characters length")
       .required("Username is required"),
-    Password: Yup.string("Enter your password")
+    password: Yup.string("Enter your password")
       .min(6, "Password should be of minimum 6 characters length")
       .required("Password is required"),
   });
@@ -32,7 +32,7 @@ const Login = ({ handleFormSubmit, isLoading }) => {
             <Field
               component={FormikTextField}
               className={`${classes.input} ${classes.field}`}
-              name='Username'
+              name='username'
               label='Username'
               InputProps={{
                 className: classes.input,
@@ -42,7 +42,7 @@ const Login = ({ handleFormSubmit, isLoading }) => {
             <Field
               component={FormikTextField}
               className={`${classes.input} ${classes.field}`}
-              name='Password'
+              name='password'
               label='Password'
               type='password'
               InputProps={{

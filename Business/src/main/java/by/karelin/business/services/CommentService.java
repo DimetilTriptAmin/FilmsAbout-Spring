@@ -1,23 +1,19 @@
 package by.karelin.business.services;
 
-import by.karelin.business.dto.Responses.CommentResponse;
-import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.persistence.dto.Responses.CommentResponse;
+import by.karelin.persistence.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.ICommentService;
 import by.karelin.domain.models.Comment;
 import by.karelin.domain.models.Film;
-import by.karelin.domain.models.Rating;
 import by.karelin.domain.models.User;
-import by.karelin.persistence.repositories.ICommentRepository;
-import by.karelin.persistence.repositories.IFilmRepository;
-import by.karelin.persistence.repositories.IRatingRepository;
-import by.karelin.persistence.repositories.IUserRepository;
-import org.springframework.data.domain.Example;
+import by.karelin.persistence.repositories.interfaces.ICommentRepository;
+import by.karelin.persistence.repositories.interfaces.IFilmRepository;
+import by.karelin.persistence.repositories.interfaces.IRatingRepository;
+import by.karelin.persistence.repositories.interfaces.IUserRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class CommentService implements ICommentService {
@@ -27,50 +23,32 @@ public class CommentService implements ICommentService {
     private IFilmRepository filmRepository;
     private IRatingRepository ratingRepository;
 
-    public ServiceResponse<CommentResponse> CreateComment(Long userId, Long filmId, String text) {
+    public ServiceResponse<CommentResponse> createComment(Long userId, Long filmId, String text) {
         try {
-            if (!userRepository.existsById(userId) || !filmRepository.existsById(filmId)) {
-                return new ServiceResponse<CommentResponse>("User or related film not found.");
-            }
-
             User user = userRepository.getById(userId);
             Film film = filmRepository.getById(filmId);
 
-            Comment comment = new Comment(user, film, text, new Date());
-            commentRepository.save(comment);
+            Comment comment = new Comment(user, film, text);
 
-            Rating rating = new Rating();
-            rating.setFilm(film);
-            rating.setUser(user);
+            boolean creationFailed = !commentRepository.tryCreateComment(comment);
 
-            Example<Rating> ratingExample = Example.of(rating);
-            Optional<Rating> ratingOptional = ratingRepository.findAll(ratingExample).stream().findFirst();
+            if(creationFailed){
+                return new ServiceResponse<CommentResponse>("Could not create comment.");
+            }
 
-            int rate = ratingOptional.isEmpty() ? 0 : rating.getRate();
+            //TODO: Rating
+            return null;
 
-            return new ServiceResponse<CommentResponse>(
-                    new CommentResponse(comment.getId(), user.getName(), user.getAvatar(), text, rate, comment.getPublishDate())
-            );
         } catch (Exception e) {
             return new ServiceResponse<CommentResponse>("Internal server error: " + e.getMessage());
         }
     }
 
-    public ServiceResponse<Long> DeleteComment(Long id) {
-        try {
-            if (!commentRepository.existsById(id)) {
-                return new ServiceResponse<>("Comment not found.");
-            }
-
-            commentRepository.deleteById(id);
-
-            return new ServiceResponse<>(id);
-        } catch (Exception e) {
-            return new ServiceResponse<>("Internal server error.");
-        }
+    public ServiceResponse<Long> deleteComment(Long id) {
+        return null;
     }
 
-    public ServiceResponse<List<CommentResponse>> GetAllByFilmId(Long id) {
+    public ServiceResponse<List<CommentResponse>> getAllByFilmId(Long id) {
         try {
             //TODO: НАПИСАТЬ СТОРКУ
             /*

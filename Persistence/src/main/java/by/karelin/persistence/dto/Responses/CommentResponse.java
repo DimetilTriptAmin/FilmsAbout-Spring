@@ -1,4 +1,4 @@
-package by.karelin.business.dto.Responses;
+package by.karelin.persistence.dto.Responses;
 
 import java.util.Date;
 
