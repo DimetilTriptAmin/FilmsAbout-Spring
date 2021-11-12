@@ -15,7 +15,7 @@ const CommentList = ({ commentList, isAuthorized, commentSubmitClick }) => {
   const validationSchema = Yup.object({
     Comment: Yup.string("Enter your comment")
       .required("Comment can not be empty.")
-      .max(500, "Review is too long."),
+      .max(255, "Review is too long."),
   });
 
   return (
@@ -53,7 +53,7 @@ const CommentList = ({ commentList, isAuthorized, commentSubmitClick }) => {
           commentList.values.map((comment, key) => (
             <Comment
               id={comment.id}
-              username={comment.userName}
+              username={comment.username}
               avatar={comment.avatar}
               text={comment.text}
               publishDate={comment.publishDate}

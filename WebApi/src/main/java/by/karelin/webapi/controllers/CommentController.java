@@ -1,8 +1,8 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.persistence.dto.Requests.CreateCommentRequest;
-import by.karelin.persistence.dto.Responses.CommentResponse;
-import by.karelin.persistence.dto.Responses.ServiceResponse;
+import by.karelin.business.dto.Requests.CreateCommentRequest;
+import by.karelin.business.dto.Responses.CommentResponse;
+import by.karelin.business.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.ICommentService;
 import by.karelin.business.utils.JwtProvider;
 import org.springframework.http.HttpStatus;
@@ -53,9 +53,15 @@ public class CommentController {
     }
 
     @DeleteMapping(value="/{id}")
-    public ResponseEntity DeleteCommentAsync(@PathVariable Long id)
+    public ResponseEntity DeleteCommentAsync(
+            @RequestHeader("Authorization") String rawToken,
+            @PathVariable Long id
+    )
     {
-        ServiceResponse<Long> response = commentService.deleteComment(id);
+        String token = rawToken.substring("Bearer ".length());
+        Long userId = jwtProvider.getIdFromToken(token);
+
+        ServiceResponse<Long> response = commentService.deleteComment(id, userId);
 
         if (!response.IsSucceeded()) {
             return new ResponseEntity<>(response.getErrorMessage(), HttpStatus.BAD_REQUEST);

@@ -1,4 +1,4 @@
-package by.karelin.persistence.dto.Responses;
+package by.karelin.business.dto.Responses;
 
 public class LoginResponse {
     private String accessToken;

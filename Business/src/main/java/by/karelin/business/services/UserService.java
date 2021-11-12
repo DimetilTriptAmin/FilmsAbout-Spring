@@ -1,14 +1,13 @@
 package by.karelin.business.services;
 
-import by.karelin.persistence.dto.Requests.LoginRequest;
-import by.karelin.persistence.dto.Requests.RegisterRequest;
-import by.karelin.persistence.dto.Requests.UpdateRequest;
-import by.karelin.persistence.dto.Responses.LoginResponse;
-import by.karelin.persistence.dto.Responses.ServiceResponse;
-import by.karelin.persistence.dto.Responses.UpdateResponse;
-import by.karelin.persistence.dto.Responses.UserResponse;
+import by.karelin.business.dto.Requests.ChangePasswordRequest;
+import by.karelin.business.dto.Requests.LoginRequest;
+import by.karelin.business.dto.Requests.RegisterRequest;
+import by.karelin.business.dto.Requests.UpdateRequest;
+import by.karelin.business.dto.Responses.*;
 import by.karelin.business.services.interfaces.IUserService;
 import by.karelin.business.utils.Base64Coder;
+import by.karelin.business.utils.ErrorCode;
 import by.karelin.business.utils.JwtProvider;
 import by.karelin.domain.models.User;
 import by.karelin.persistence.repositories.interfaces.IUserRepository;
@@ -34,25 +33,25 @@ public class UserService implements IUserService {
         User user = userRepository.getById(userId);
 
         if (user == null) {
-            return new ServiceResponse<UserResponse>("User not found");
+            return new ServiceResponse<>("User not found");
         }
 
         UserResponse response = modelMapper.map(user, UserResponse.class);
 
-        return new ServiceResponse<UserResponse>(response);
+        return new ServiceResponse<>(response);
     }
 
-    public ServiceResponse<UpdateResponse> updateAvatar(Long userId, UpdateRequest updateRequest) {
+    public ServiceResponse<UpdateAvatarResponse> updateAvatar(Long userId, UpdateRequest updateRequest) {
         String newAvatar = updateRequest.getAvatar();
         User user = userRepository.getById(userId);
 
-        boolean updateFailed = !userRepository.tryUpdateAvatar(user.getId(), newAvatar);
+        Long idResult = userRepository.updateAvatar(user.getId(), newAvatar);
 
-        if (updateFailed) {
-            return new ServiceResponse<UpdateResponse>("Could not update the avatar");
+        if (idResult == ErrorCode.RepositoryTransactionError.getValue()) {
+            return new ServiceResponse<>("Could not update the avatar");
         }
 
-        UpdateResponse updateResponse = new UpdateResponse(newAvatar);
+        UpdateAvatarResponse updateResponse = new UpdateAvatarResponse(newAvatar);
 
         return new ServiceResponse<>(updateResponse);
     }
@@ -65,23 +64,23 @@ public class UserService implements IUserService {
 
             if (user == null)
             {
-                return new ServiceResponse<LoginResponse>("No such Username.");
+                return new ServiceResponse<>("No such Username.");
             }
 
             boolean isPasswordCorrect = passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash());
 
             if (!isPasswordCorrect)
             {
-                return new ServiceResponse<LoginResponse>("Password does not match.");
+                return new ServiceResponse<>("Password does not match.");
             }
 
             LoginResponse response = AuthorizeUser(user);
 
-            return new ServiceResponse<LoginResponse>(response);
+            return new ServiceResponse<>(response);
         }
         catch(Exception ex)
         {
-            return new ServiceResponse<LoginResponse>("Server is offline.");
+            return new ServiceResponse<>("Server is offline.");
         }
     }
 
@@ -93,18 +92,18 @@ public class UserService implements IUserService {
 
             if (user != null)
             {
-                return new ServiceResponse<LoginResponse>("This Username is taken.");
+                return new ServiceResponse<>("This Username is taken.");
             }
 
             user = userRepository.getByEmail(registerRequest.getEmail());
             if (user != null)
             {
-                return new ServiceResponse<LoginResponse>("This email is registered.");
+                return new ServiceResponse<>("This email is registered.");
             }
 
             if (!registerRequest.getPassword().contentEquals(registerRequest.getConfirmPassword()))
             {
-                return new ServiceResponse<LoginResponse>("Passwords must be equal.");
+                return new ServiceResponse<>("Passwords must be equal.");
             }
 
             user = new User(
@@ -114,104 +113,44 @@ public class UserService implements IUserService {
                     registerRequest.getEmail()
             );
 
-            boolean succeeded = userRepository.tryRegisterUser(user);
+            Long userId = userRepository.registerUser(user);
 
-            if(!succeeded)
+            if(userId == ErrorCode.RepositoryTransactionError.getValue())
             {
-                return new ServiceResponse<LoginResponse>("Register failed.");
+                return new ServiceResponse<>("Register failed.");
             }
 
             LoginResponse response = AuthorizeUser(user);
 
-            return new ServiceResponse<LoginResponse>(response);
+            return new ServiceResponse<>(response);
         }
         catch(Exception ex)
         {
-            return new ServiceResponse<LoginResponse>("Server is offline.");
-        }
-    }
-    /*
-
-    public async Task<GenericResponse<bool>> LogoutAsync(int id)
-    {
-        try
-        {
-            User user = await _unitOfWork.UserRepository.GetAsync(id);
-
-            if (user == null)
-            {
-                return new GenericResponse<bool>("Invalid token.");
-            }
-
-            user.refreshToken = "";
-            await _unitOfWork.UserRepository.UpdateAsync(user);
-            await _unitOfWork.SaveAsync();
-            return new GenericResponse<bool>(true);
-        }
-        catch
-        {
-            return new GenericResponse<bool>("Server is offline.");
+            return new ServiceResponse<>("Server is offline.");
         }
     }
 
-    public async Task<GenericResponse<LoginResponse>> RefreshAsync(string token)
-    {
-        try
+    @Override
+    public ServiceResponse<LoginResponse> changePassword(Long userId, ChangePasswordRequest passwordRequest) {
+        Long resultId = userRepository.changePassword(userId, passwordRequest.getNewPassword());
+
+        if (resultId == ErrorCode.RepositoryTransactionError.getValue())
         {
-            var request = await _unitOfWork.UserRepository.Filter(user => user.refreshToken == token);
-
-            var user = request.FirstOrDefault();
-
-            if (user == null)
-            {
-                return new GenericResponse<LoginResponse>("Invalid token.");
-            }
-
-            LoginResponse response = AuthorizeUser(user);
-            user.refreshToken = response.RefreshToken;
-            await _unitOfWork.UserRepository.UpdateAsync(user);
-            await _unitOfWork.SaveAsync();
-            return new GenericResponse<LoginResponse>(response);
+            return new ServiceResponse<>("Could not change the password");
         }
-        catch
-        {
-            return new GenericResponse<LoginResponse>("Server is offline.");
-        }
+
+        return new ServiceResponse<>(AuthorizeUser(resultId));
     }
 
-    public async Task<GenericResponse<bool>> ChangePasswordAsync(int id, ChangePasswordRequest changePasswordRequest)
-    {
-        try
-        {
-            var user = await _userManager.FindByIdAsync(id.ToString());
-
-            if (user == null)
-            {
-                return new GenericResponse<bool>("Bad request.");
-            }
-
-            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, changePasswordRequest.OldPassword);
-
-            if (!isPasswordCorrect)
-            {
-                return new GenericResponse<bool>("Password incorrect..");
-            }
-
-            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, changePasswordRequest.NewPassword);
-            await _userManager.UpdateAsync(user);
-            return new GenericResponse<bool>(true);
-        }
-        catch
-        {
-            return new GenericResponse<bool>("Server is offline.");
-        }
-    }
-     */
     private LoginResponse AuthorizeUser(User user)
     {
         String accessToken = jwtProvider.generateToken(user.getId());
-        //var refreshToken = _generator.GenerateRefreshToken();
+        return new LoginResponse(accessToken);
+    }
 
+    private LoginResponse AuthorizeUser(Long id)
+    {
+        String accessToken = jwtProvider.generateToken(id);
         return new LoginResponse(accessToken);
     }
 }

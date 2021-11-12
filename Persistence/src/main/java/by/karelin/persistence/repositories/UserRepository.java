@@ -1,9 +1,7 @@
 package by.karelin.persistence.repositories;
 
-import by.karelin.domain.models.Film;
 import by.karelin.domain.models.User;
 import by.karelin.persistence.repositories.interfaces.IUserRepository;
-import oracle.jdbc.internal.OracleTypes;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -61,34 +59,35 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public boolean tryRegisterUser(User user) {
+    public Long registerUser(User user) {
         StoredProcedureQuery query = entityManager
-                .createStoredProcedureQuery("SP_USER_TRY_REGISTER")
+                .createStoredProcedureQuery("SP_USER_REGISTER")
                 .registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
                 .registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
                 .registerStoredProcedureParameter(3, Clob.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(4, String.class, ParameterMode.IN);
+                .registerStoredProcedureParameter(4, String.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(5, Long.class, ParameterMode.OUT);
         query.setParameter(1, user.getName());
         query.setParameter(2, user.getPasswordHash());
         query.setParameter(3, org.hibernate.engine.jdbc.NonContextualLobCreator.INSTANCE.createClob(user.getAvatar()));
         query.setParameter(4, user.getEmail());
-        boolean succeeded = query.execute();
 
-        return succeeded;
+        query.execute();
+
+        return (Long) query.getOutputParameterValue(5);
     }
 
     @Override
-    public boolean tryUpdateAvatar(Long id, String avatar) {
+    public Long updateAvatar(Long id, String avatar) {
         StoredProcedureQuery query = entityManager
-                .createStoredProcedureQuery("SP_USER_TRY_UPDATE_AVATAR")
+                .createStoredProcedureQuery("SP_USER_UPDATE_AVATAR")
                 .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(2, Long.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(3, Class.class, ParameterMode.OUT);
+                .registerStoredProcedureParameter(2, Clob.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(3, Long.class, ParameterMode.OUT);
         query.setParameter(1, id);
-        query.setParameter(2, avatar);
+        query.setParameter(2, org.hibernate.engine.jdbc.NonContextualLobCreator.INSTANCE.createClob(avatar));
         query.execute();
 
-        boolean succeeded = (boolean) query.getOutputParameterValue(3);
-        return succeeded;
+        return (Long) query.getOutputParameterValue(3);
     }
 }

@@ -6,6 +6,7 @@ public interface IUserRepository {
     User getById(Long id);
     User getByUsername(String userName);
     User getByEmail(String email);
-    boolean tryRegisterUser(User user);
-    boolean tryUpdateAvatar(Long id, String avatar);
+    Long registerUser(User user);
+    Long updateAvatar(Long id, String avatar);
+    Long changePassword(Long id, String newPassword);
 }

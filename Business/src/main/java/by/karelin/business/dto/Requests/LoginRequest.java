@@ -1,4 +1,4 @@
-package by.karelin.persistence.dto.Requests;
+package by.karelin.business.dto.Requests;
 
 public class LoginRequest {
     private String username;

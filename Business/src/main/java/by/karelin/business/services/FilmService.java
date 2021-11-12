@@ -1,6 +1,6 @@
 package by.karelin.business.services;
 
-import by.karelin.persistence.dto.Responses.ServiceResponse;
+import by.karelin.business.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.IFilmService;
 import by.karelin.domain.models.Film;
 import by.karelin.persistence.repositories.interfaces.IFilmRepository;

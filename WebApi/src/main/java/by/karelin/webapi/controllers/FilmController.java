@@ -1,6 +1,6 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.persistence.dto.Responses.ServiceResponse;
+import by.karelin.business.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.IFilmService;
 import by.karelin.domain.models.Film;
 import org.springframework.http.HttpStatus;

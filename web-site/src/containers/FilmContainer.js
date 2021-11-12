@@ -39,7 +39,6 @@ const FilmContainer = () => {
     dispatch(filmIdRequest(title));
     if (filmData.idFetched) {
       dispatch(filmRequest(filmData.id));
-      dispatch(commentListRequest(filmData.id));
       if (isAuthorized) dispatch(currentFilmRatingRequest(filmData.id));
     }
     return () => {

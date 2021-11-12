@@ -1,8 +1,8 @@
 package by.karelin.persistence.repositories.interfaces;
 
-import by.karelin.persistence.dto.Responses.RatingResponse;
+import by.karelin.domain.models.Rating;
 
 public interface IRatingRepository {
-    RatingResponse getUserRating(Long userId, Long filmId);
-    boolean trySetRating(int rate, Long filmId, Long userId);
+    Rating getUserRating(Long userId, Long filmId);
+    Long setRating(int rate, Long filmId, Long userId);
 }

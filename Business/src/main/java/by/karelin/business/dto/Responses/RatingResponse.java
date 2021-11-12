@@ -1,4 +1,4 @@
-package by.karelin.persistence.dto.Responses;
+package by.karelin.business.dto.Responses;
 
 public class RatingResponse {
     private Long userId;
@@ -8,6 +8,8 @@ public class RatingResponse {
         this.userId = userId;
         this.rate = rate;
     }
+
+    public RatingResponse() {}
 
     public Long getUserId() {
         return userId;

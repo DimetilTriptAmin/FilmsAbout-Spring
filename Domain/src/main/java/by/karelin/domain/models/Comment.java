@@ -1,8 +1,21 @@
 package by.karelin.domain.models;
 
+import by.karelin.domain.pojo.CommentViewModel;
+
 import javax.persistence.*;
 import java.util.Date;
 
+@SqlResultSetMapping(name = "CommentViewModelMapping",
+        classes = @ConstructorResult(targetClass = CommentViewModel.class,
+                columns = {
+                        @ColumnResult( name = "ID",type = Long.class),
+                        @ColumnResult(name = "NAME", type = String.class),
+                        @ColumnResult(name = "AVATAR", type = String.class),
+                        @ColumnResult(name = "TEXT",type = String.class),
+                        @ColumnResult(name = "PUBLISH_DATE", type = Date.class),
+                        @ColumnResult(name = "RATE", type = int.class)}
+        )
+)
 @Entity
 @Table(name = "FA_COMMENT")
 public class Comment {
@@ -11,7 +24,7 @@ public class Comment {
     private Long id;
     private String text;
     private Date publishDate;
-    private boolean isDeleted;
+    private Integer isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
@@ -25,7 +38,7 @@ public class Comment {
         this.user = user;
         this.film = film;
         this.text = text;
-        this.isDeleted = false;
+        this.isDeleted = 0;
         publishDate = new Date();
     }
 
@@ -71,11 +84,11 @@ public class Comment {
         this.film = film;
     }
 
-    public boolean isDeleted() {
+    public Integer isDeleted() {
         return isDeleted;
     }
 
-    public void setDeleted(boolean deleted) {
+    public void setDeleted(Integer deleted) {
         isDeleted = deleted;
     }
 

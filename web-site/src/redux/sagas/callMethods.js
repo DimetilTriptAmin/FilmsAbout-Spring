@@ -17,7 +17,7 @@ export function* userRequest(payload, accessToken) {
 export function* changePasswordRequest(payload, accessToken) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/User/changePassword`,
+    `https://localhost:8443/api/User/password`,
     "put",
     payload,
     accessToken,
@@ -61,15 +61,15 @@ export function* registrationRequest(payload) {
 
 export function* logOutRequest(payload, accessToken) {
   yield window.localStorage.removeItem("accessToken");
-  const response = yield call(
-    axiosDefault,
-    `https://localhost:8443/api/User/logout`,
-    "delete",
-    payload,
-    accessToken,
-  );
+  //const response = yield call(
+    //axiosDefault,
+    //`https://localhost:8443/api/User/logout`,
+    //"delete",
+    //payload,
+    //accessToken,
+  //);
   yield call(payload.go(0));
-  return response;
+  //return response;
 }
 
 export function* currentFilmRatingRequest(payload, accessToken) {

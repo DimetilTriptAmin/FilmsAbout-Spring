@@ -1,12 +1,10 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.persistence.dto.Requests.LoginRequest;
-import by.karelin.persistence.dto.Requests.RegisterRequest;
-import by.karelin.persistence.dto.Requests.UpdateRequest;
-import by.karelin.persistence.dto.Responses.LoginResponse;
-import by.karelin.persistence.dto.Responses.ServiceResponse;
-import by.karelin.persistence.dto.Responses.UpdateResponse;
-import by.karelin.persistence.dto.Responses.UserResponse;
+import by.karelin.business.dto.Requests.ChangePasswordRequest;
+import by.karelin.business.dto.Requests.LoginRequest;
+import by.karelin.business.dto.Requests.RegisterRequest;
+import by.karelin.business.dto.Requests.UpdateRequest;
+import by.karelin.business.dto.Responses.*;
 import by.karelin.business.services.interfaces.IUserService;
 import by.karelin.business.utils.JwtProvider;
 import org.springframework.http.HttpStatus;
@@ -31,7 +29,8 @@ public class UserController {
 
         ServiceResponse<UserResponse> response = userService.getById(userId);
 
-        if (!response.IsSucceeded()) {
+        if (!response.IsSucceeded())
+        {
             return new ResponseEntity(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(response.getValue(), HttpStatus.OK);
@@ -45,9 +44,10 @@ public class UserController {
         String token = rawToken.substring("Bearer ".length());
         Long userId = jwtProvider.getIdFromToken(token);
 
-        ServiceResponse<UpdateResponse> response = userService.updateAvatar(userId, updateData);
+        ServiceResponse<UpdateAvatarResponse> response = userService.updateAvatar(userId, updateData);
 
-        if (!response.IsSucceeded()) {
+        if (!response.IsSucceeded())
+        {
             return new ResponseEntity(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity(response.getValue(), HttpStatus.OK);
@@ -57,11 +57,11 @@ public class UserController {
     public ResponseEntity login(@RequestBody LoginRequest loginData) {
         ServiceResponse<LoginResponse> response = userService.loginUser(loginData);
 
-        if (!response.IsSucceeded()) {
+        if (!response.IsSucceeded())
+        {
             return new ResponseEntity(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        //SetCookie(response.Value);
         return new ResponseEntity(response.getValue(), HttpStatus.OK);
 
     }
@@ -76,22 +76,26 @@ public class UserController {
             return new ResponseEntity(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        //SetCookie(response.Value);
         return new ResponseEntity(response.getValue(), HttpStatus.OK);
     }
-    /*
-        [HttpPut("changePassword")]
-            [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordRequest changePasswordRequest)
+
+    @PutMapping("password")
+    public ResponseEntity changePassword(
+            @RequestHeader("Authorization") String rawToken,
+            @RequestBody ChangePasswordRequest changePasswordRequest)
     {
-        var token = Request.Headers["Authorization"].ToString().Split()[Constants.TOKEN_VALUE_INDEX];
+        String token = rawToken.substring("Bearer ".length());
+        Long userId = jwtProvider.getIdFromToken(token);
 
-        int userId = _tokenDecoder.getUserIdFromToken(token);
+        ServiceResponse<ChangePasswordResponse> response =
+                userService.changePassword(userId, changePasswordRequest);
 
-        var response = await _userService.ChangePasswordAsync(userId, changePasswordRequest);
+        if (!response.IsSucceeded())
+        {
+            return new ResponseEntity(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
+        }
 
-        if (!response.IsSucceeded) return BadRequest(response.ErrorMessage);
-        return Ok(response.Value);
+        return new ResponseEntity(response.getValue(), HttpStatus.OK);
     }
-     */
+
 }

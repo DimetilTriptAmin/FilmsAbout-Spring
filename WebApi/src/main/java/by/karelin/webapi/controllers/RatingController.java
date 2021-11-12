@@ -1,8 +1,8 @@
 package by.karelin.webapi.controllers;
 
-import by.karelin.persistence.dto.Requests.SetRatingRequest;
-import by.karelin.persistence.dto.Responses.RatingResponse;
-import by.karelin.persistence.dto.Responses.ServiceResponse;
+import by.karelin.business.dto.Requests.SetRatingRequest;
+import by.karelin.business.dto.Responses.RatingResponse;
+import by.karelin.business.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.IRatingService;
 import by.karelin.business.utils.JwtProvider;
 import org.springframework.http.HttpStatus;

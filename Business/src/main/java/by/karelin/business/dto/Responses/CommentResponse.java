@@ -1,28 +1,21 @@
-package by.karelin.persistence.dto.Responses;
+package by.karelin.business.dto.Responses;
 
 import java.util.Date;
 
 public class CommentResponse {
     private Long id;
-    private String userName;
+    private String username;
     private String avatar;
     private String text;
     private Date publishDate;
     private int rating;
 
     //region ctors
-    public CommentResponse(String userName, String avatar, String text, int rating, Date publishDate)
-    {
-        this.userName = userName;
-        this.avatar = avatar;
-        this.text = text;
-        this.rating = rating;
-        this.publishDate = publishDate;
-    }
-    public CommentResponse(Long id, String userName, String avatar, String text, int rating, Date publishDate)
+    public CommentResponse() {}
+    public CommentResponse(Long id, String username, String avatar, String text, Date publishDate, int rating)
     {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.avatar = avatar;
         this.text = text;
         this.rating = rating;
@@ -39,12 +32,12 @@ public class CommentResponse {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String userName) {
+        this.username = userName;
     }
 
     public String getAvatar() {

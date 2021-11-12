@@ -1,27 +1,40 @@
 package by.karelin.business.services;
 
-import by.karelin.persistence.dto.Responses.CommentResponse;
-import by.karelin.persistence.dto.Responses.ServiceResponse;
+import by.karelin.business.utils.ErrorCode;
+import by.karelin.domain.models.Rating;
+import by.karelin.business.dto.Responses.CommentResponse;
+import by.karelin.business.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.ICommentService;
 import by.karelin.domain.models.Comment;
 import by.karelin.domain.models.Film;
 import by.karelin.domain.models.User;
+import by.karelin.domain.pojo.CommentViewModel;
 import by.karelin.persistence.repositories.interfaces.ICommentRepository;
 import by.karelin.persistence.repositories.interfaces.IFilmRepository;
 import by.karelin.persistence.repositories.interfaces.IRatingRepository;
 import by.karelin.persistence.repositories.interfaces.IUserRepository;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class CommentService implements ICommentService {
 
-    private IUserRepository userRepository;
-    private ICommentRepository commentRepository;
-    private IFilmRepository filmRepository;
-    private IRatingRepository ratingRepository;
+    private final IUserRepository userRepository;
+    private final ICommentRepository commentRepository;
+    private final IFilmRepository filmRepository;
+    private final ModelMapper modelMapper;
+    private final IRatingRepository ratingRepository;
+
+    public CommentService(IUserRepository userRepository, ICommentRepository commentRepository, IFilmRepository filmRepository, ModelMapper modelMapper, IRatingRepository ratingRepository) {
+        this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+        this.filmRepository = filmRepository;
+        this.modelMapper = modelMapper;
+        this.ratingRepository = ratingRepository;
+    }
 
     public ServiceResponse<CommentResponse> createComment(Long userId, Long filmId, String text) {
         try {
@@ -30,54 +43,51 @@ public class CommentService implements ICommentService {
 
             Comment comment = new Comment(user, film, text);
 
-            boolean creationFailed = !commentRepository.tryCreateComment(comment);
+            Long createdCommentId = commentRepository.createComment(comment);
 
-            if(creationFailed){
+            if(createdCommentId == ErrorCode.RepositoryTransactionError.getValue()){
                 return new ServiceResponse<CommentResponse>("Could not create comment.");
             }
 
-            //TODO: Rating
-            return null;
+            Rating rating = ratingRepository.getUserRating(userId, filmId);
 
+            CommentResponse response = new CommentResponse(
+                    createdCommentId,
+                    user.getName(),
+                    user.getAvatar(),
+                    text,
+                    comment.getPublishDate(),
+                    rating.getRate()
+            );
+
+            return new ServiceResponse<CommentResponse>(response);
         } catch (Exception e) {
             return new ServiceResponse<CommentResponse>("Internal server error: " + e.getMessage());
         }
     }
 
-    public ServiceResponse<Long> deleteComment(Long id) {
-        return null;
+    public ServiceResponse<Long> deleteComment(Long id, Long userId) {
+        try {
+            Long resultId = commentRepository.deleteComment(id, userId);
+
+            if(resultId == ErrorCode.RepositoryTransactionError.getValue()){
+                return new ServiceResponse<>("Could not delete the comment.");
+            }
+
+            return new ServiceResponse<>(resultId);
+        } catch (Exception e) {
+            return new ServiceResponse<>("Internal server error.");
+        }
     }
 
     public ServiceResponse<List<CommentResponse>> getAllByFilmId(Long id) {
         try {
-            //TODO: НАПИСАТЬ СТОРКУ
-            /*
-            var comments = await _unitOfWork.CommentRepository.Filter(c => c.FilmId == id);
-            var ratings = await _unitOfWork.RatingRepository.Filter(r => r.FilmId == id);
-            var users = await _unitOfWork.UserRepository.GetAllAsync();
+            List<CommentViewModel> commentViewModels = commentRepository.getAllByFilmId(id);
 
-            var commentsJoinRatings = from comment in comments
-            join rating in ratings
-            on comment.UserId equals rating.UserId
-            into CommentList
-            from rating in CommentList.DefaultIfEmpty()
-            select new
-            {
-                CommentId = comment.Id,
-                        UserId = comment.UserId,
-                        Text = comment.Text,
-                        PublishDate = comment.PublishDate,
-                        Rating = rating == null ? 0 : rating.Rate,
-            };
+            List<CommentResponse> commentViews
+                    = modelMapper.map(commentViewModels, new TypeToken<List<CommentResponse>>() {}.getType());
 
-            var commentListJoinUsers = commentsJoinRatings
-                    .Join(users, cnr => cnr.UserId, user => user.Id,
-                (cnr, user) =>
-            new CommentResponse(cnr.CommentId, user.UserName, user.Avatar, cnr.Text, cnr.Rating, cnr.PublishDate))
-                    .ToList();
-            */
-            List<CommentResponse> commentListJoinUsers = new ArrayList<>();
-            return new ServiceResponse<>(commentListJoinUsers);
+            return new ServiceResponse<List<CommentResponse>>(commentViews);
         } catch (Exception e) {
             return new ServiceResponse<>("Internal server error.");
         }
