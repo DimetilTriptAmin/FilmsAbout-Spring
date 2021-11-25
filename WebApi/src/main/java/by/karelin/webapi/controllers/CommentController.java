@@ -1,16 +1,20 @@
 package by.karelin.webapi.controllers;
 
 import by.karelin.business.dto.Requests.CreateCommentRequest;
+import by.karelin.business.dto.Requests.UpdateCommentRequest;
 import by.karelin.business.dto.Responses.CommentResponse;
 import by.karelin.business.dto.Responses.ServiceResponse;
 import by.karelin.business.services.interfaces.ICommentService;
 import by.karelin.business.utils.JwtProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping(value = "api/Comment")
 public class CommentController {
@@ -22,10 +26,15 @@ public class CommentController {
         this.jwtProvider = jwtProvider;
     }
 
-    @GetMapping(value = "/all/{filmId}")
-    public ResponseEntity GetAllByFilmIdAsync(@PathVariable Long filmId)
+    @GetMapping(value = "/{filmId}/{pageNumber}/{pageSize}")
+    public ResponseEntity getCommentPage(
+            @PathVariable Long filmId,
+            @PathVariable Integer pageNumber,
+            @PathVariable Integer pageSize
+    )
     {
-        ServiceResponse<List<CommentResponse>> response = commentService.getAllByFilmId(filmId);
+        ServiceResponse<List<CommentResponse>> response =
+                commentService.getCommentPage(filmId, pageNumber, pageSize);
 
         if (!response.IsSucceeded()) {
             return new ResponseEntity<>(response.getErrorMessage(), HttpStatus.NOT_FOUND);
@@ -34,13 +43,59 @@ public class CommentController {
         return new ResponseEntity<List<CommentResponse>>(response.getValue(), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity CreateCommentAsync(
+    @GetMapping(value = "/{filmId}/{pageNumber}/{pageSize}/deleted")
+    public ResponseEntity getDeletedCommentPage(
             @RequestHeader("Authorization") String rawToken,
-            @RequestBody CreateCommentRequest request
+            @PathVariable Long filmId,
+            @PathVariable Integer pageNumber,
+            @PathVariable Integer pageSize
+    )
+    {
+
+        String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized = !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = jwtProvider.getIdFromToken(token);
+
+        ServiceResponse<List<CommentResponse>> response =
+                commentService.getDeletedCommentPage(userId, filmId, pageNumber, pageSize);
+
+        if (!response.IsSucceeded()) {
+            return new ResponseEntity<>(response.getErrorMessage(), response.getHttpStatus());
+        }
+
+        return new ResponseEntity<List<CommentResponse>>(response.getValue(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{filmId}/{pageSize}")
+    public ResponseEntity getPagesAmount(
+            @PathVariable Long filmId,
+            @PathVariable Integer pageSize
+    )
+    {
+        ServiceResponse<Integer> response =
+                commentService.getCommentPagesAmount(filmId, pageSize);
+
+        if (!response.IsSucceeded()) {
+            return new ResponseEntity<>(response.getErrorMessage(), HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<Integer>(response.getValue(), HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity createComment(
+            @RequestHeader("Authorization") String rawToken,
+            @Valid @RequestBody CreateCommentRequest request
     )
     {
         String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<CommentResponse> response =
@@ -52,13 +107,39 @@ public class CommentController {
         return new ResponseEntity<CommentResponse>(response.getValue(), HttpStatus.OK);
     }
 
+    @PutMapping
+    public ResponseEntity updateComment(
+            @RequestHeader("Authorization") String rawToken,
+            @Valid @RequestBody UpdateCommentRequest request
+    )
+    {
+        String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = jwtProvider.getIdFromToken(token);
+
+        ServiceResponse<Long> response =
+                commentService.updateComment(userId, request);
+
+        if (!response.IsSucceeded()) {
+            return new ResponseEntity<>(response.getErrorMessage(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(response.getValue(), HttpStatus.OK);
+    }
+
     @DeleteMapping(value="/{id}")
-    public ResponseEntity DeleteCommentAsync(
+    public ResponseEntity deleteComment(
             @RequestHeader("Authorization") String rawToken,
             @PathVariable Long id
     )
     {
         String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<Long> response = commentService.deleteComment(id, userId);

@@ -1,14 +1,18 @@
 package by.karelin.webapi.controllers;
 
 import by.karelin.business.dto.Responses.ServiceResponse;
+import by.karelin.business.exceptions.ServiceException;
 import by.karelin.business.services.interfaces.IFilmService;
 import by.karelin.domain.models.Film;
+import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping(value = "api/Film")
 public class FilmController {
@@ -26,6 +30,7 @@ public class FilmController {
 
     @GetMapping(value = "/{id}")
     public @ResponseBody ResponseEntity getFilm(@PathVariable Long id)
+            throws ServiceException, NotFoundException
     {
         ServiceResponse<Film> response = filmService.GetById(id);
 
@@ -37,7 +42,8 @@ public class FilmController {
     }
 
     @GetMapping(value = "id/{title}")
-    public @ResponseBody ResponseEntity getFilmIdAsync(@PathVariable String title)
+    public @ResponseBody ResponseEntity getFilmId(@PathVariable String title)
+            throws ServiceException, NotFoundException
     {
         ServiceResponse<Long> response = filmService.GetIdByTitle(title);
 

@@ -1,5 +1,7 @@
 package by.karelin.domain.models;
 
+import by.karelin.domain.utils.enums.UserRole;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,6 +11,7 @@ public class Film {
     @GeneratedValue
     private Long id;
     private String title;
+    @Lob
     private String poster;
     private String producer;
     private String description;

@@ -1,4 +1,4 @@
-package by.karelin.business.utils;
+package by.karelin.business.utils.enums;
 
 public enum ErrorCode {
     RepositoryTransactionError(-1);

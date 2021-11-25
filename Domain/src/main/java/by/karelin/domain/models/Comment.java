@@ -1,21 +1,34 @@
 package by.karelin.domain.models;
 
 import by.karelin.domain.pojo.CommentViewModel;
+import by.karelin.domain.pojo.DeletedCommentViewModel;
 
 import javax.persistence.*;
 import java.util.Date;
-
-@SqlResultSetMapping(name = "CommentViewModelMapping",
-        classes = @ConstructorResult(targetClass = CommentViewModel.class,
-                columns = {
-                        @ColumnResult( name = "ID",type = Long.class),
-                        @ColumnResult(name = "NAME", type = String.class),
-                        @ColumnResult(name = "AVATAR", type = String.class),
-                        @ColumnResult(name = "TEXT",type = String.class),
-                        @ColumnResult(name = "PUBLISH_DATE", type = Date.class),
-                        @ColumnResult(name = "RATE", type = int.class)}
+@SqlResultSetMappings({
+        @SqlResultSetMapping(name = "CommentViewModelMapping",
+                classes = @ConstructorResult(targetClass = CommentViewModel.class,
+                        columns = {
+                                @ColumnResult(name = "ID", type = Long.class),
+                                @ColumnResult(name = "NAME", type = String.class),
+                                @ColumnResult(name = "AVATAR", type = String.class),
+                                @ColumnResult(name = "TEXT", type = String.class),
+                                @ColumnResult(name = "PUBLISH_DATE", type = Date.class),
+                                @ColumnResult(name = "RATE", type = int.class)}
+                )
+        ),
+        @SqlResultSetMapping(name = "DeletedCommentViewModelMapping",
+                classes = @ConstructorResult(targetClass = DeletedCommentViewModel.class,
+                        columns = {
+                                @ColumnResult(name = "ID", type = Long.class),
+                                @ColumnResult(name = "NAME", type = String.class),
+                                @ColumnResult(name = "TEXT", type = String.class),
+                                @ColumnResult(name = "PUBLISH_DATE", type = Date.class),
+                                @ColumnResult(name = "RATE", type = int.class)}
+                )
         )
-)
+})
+
 @Entity
 @Table(name = "FA_COMMENT")
 public class Comment {

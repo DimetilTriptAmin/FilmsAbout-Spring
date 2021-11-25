@@ -35,6 +35,22 @@ public class CommentRepository implements ICommentRepository {
     }
 
     @Override
+    public Long updateComment(Long id, Long userId, String text) {
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("sp_comment_update")
+                .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(2, Long.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(3, String.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(4, Long.class, ParameterMode.OUT);
+        query.setParameter(1, id);
+        query.setParameter(2, userId);
+        query.setParameter(3, text);
+        query.execute();
+        Long resultId = (Long) query.getOutputParameterValue(4);
+        return resultId;
+    }
+
+    @Override
     public Long deleteComment(Long id, Long userId) {
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("sp_comment_delete")
@@ -49,16 +65,57 @@ public class CommentRepository implements ICommentRepository {
         return idResult;
     }
     @Override
-    public List<CommentViewModel> getAllByFilmId(Long filmId) {
+    public List<CommentViewModel> getCommentPage(Long filmId, Integer pageNumber, Integer pageSize) {
         StoredProcedureQuery query = entityManager
-                .createStoredProcedureQuery("SP_COMMENT_GET_ALL", "CommentViewModelMapping")
+                .createStoredProcedureQuery("sp_comment_get_page", "CommentViewModelMapping")
                 .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(2, Class.class, ParameterMode.REF_CURSOR);
+                .registerStoredProcedureParameter(2, Integer.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(3, Integer.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(4, Class.class, ParameterMode.REF_CURSOR);
         query.setParameter(1, filmId);
+        query.setParameter(2, pageNumber);
+        query.setParameter(3, pageSize);
+
         query.execute();
 
         List<CommentViewModel> comments = query.getResultList();
 
         return comments;
+    }
+
+    @Override
+    public List<CommentViewModel> getDeletedCommentPage(Long filmId, Integer pageNumber, Integer pageSize) {
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("sp_comment_get_deleted", "DeletedCommentViewModelMapping")
+                .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(2, Integer.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(3, Integer.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(4, Class.class, ParameterMode.REF_CURSOR);
+        query.setParameter(1, filmId);
+        query.setParameter(2, pageNumber);
+        query.setParameter(3, pageSize);
+
+        query.execute();
+
+        List<CommentViewModel> comments = query.getResultList();
+
+        return comments;
+    }
+
+    @Override
+    public Integer getCommentPagesAmount(Long filmId, Integer pageSize) {
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("sp_comment_get_pages_amount")
+                .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(2, Integer.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(3, Integer.class, ParameterMode.OUT);
+        query.setParameter(1, filmId);
+        query.setParameter(2, pageSize);
+
+        query.execute();
+
+        Integer amount = (Integer) query.getOutputParameterValue(3);
+
+        return amount;
     }
 }

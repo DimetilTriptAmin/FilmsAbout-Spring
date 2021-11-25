@@ -52,6 +52,24 @@ const useStyles = makeStyles((theme) => ({
     border: "0",
     fontSize: "20px",
   },
+
+  paginationContainer: {
+    display: "flex",
+    justifyContent: "center",
+    margin: "10px"
+  },
+
+
+  pagination: {
+    "& .MuiPaginationItem-root": {
+      color: "#fff",
+    },
+    "& .css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected": {
+      backgroundColor: alpha(theme.palette.common.white, 0.1),
+    }
+    
+  },
+
 }));
 
 export default useStyles;

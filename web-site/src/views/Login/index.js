@@ -13,9 +13,11 @@ const Login = ({ handleFormSubmit, isLoading }) => {
   const validationSchema = Yup.object({
     username: Yup.string("Enter your username")
       .min(2, "Username should be of minimum 2 characters length")
+      .max(20, "Username should not be longer than 20 characters")
       .required("Username is required"),
     password: Yup.string("Enter your password")
       .min(6, "Password should be of minimum 6 characters length")
+      .max(20, "Password should not be longer than 20 characters")
       .required("Password is required"),
   });
 

@@ -16,8 +16,11 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: "100%",
   },
   cardContent: {
-    height: "100px",
     color: "white",
+  },
+  cardContentText: {
+    height: "100px",
+    overflow: "hidden",
   },
   button: {
     color: theme.palette.common.white,

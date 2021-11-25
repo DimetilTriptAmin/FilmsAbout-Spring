@@ -24,6 +24,14 @@ const useStyles = makeStyles((theme) => ({
     },
     color: "#fff",
   },
+  modal: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: 'black',
+    boxShadow: "0px 0px 20px black",
+  }
 }));
 
 export default useStyles;

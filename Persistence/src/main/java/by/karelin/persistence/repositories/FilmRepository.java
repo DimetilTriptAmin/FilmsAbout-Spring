@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public class FilmRepository implements IFilmRepository {
-    @PersistenceContext
+    @PersistenceContext(type = PersistenceContextType.EXTENDED)
     private EntityManager entityManager;
 
     @Override
@@ -29,7 +29,7 @@ public class FilmRepository implements IFilmRepository {
     @Override
     public Film getById(Long id) {
         StoredProcedureQuery query = entityManager
-                .createStoredProcedureQuery("SP_FILM_GET_BY_ID", Film.class)
+                .createStoredProcedureQuery("sp_film_get_by_id", Film.class)
                 .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
                 .registerStoredProcedureParameter(2, Class.class,
                         ParameterMode.REF_CURSOR);
@@ -51,18 +51,5 @@ public class FilmRepository implements IFilmRepository {
 
         Long id = (Long) query.getOutputParameterValue(2);
         return id;
-    }
-
-    @Override
-    public Double updateRating(Long id) {
-        StoredProcedureQuery query = entityManager
-                .createStoredProcedureQuery("sp_film_update_rating")
-                .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(2, Double.class, ParameterMode.OUT);
-        query.setParameter(1, id);
-        query.execute();
-
-        Double rating = (Double) query.getOutputParameterValue(2);
-        return rating;
     }
 }

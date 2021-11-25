@@ -103,7 +103,15 @@ export function* setFilmRatingRequest(payload, accessToken) {
 export function* commentListRequest(payload) {
   return yield call(
     axiosDefault,
-    `https://localhost:8443/api/Comment/all/${payload}`,
+    `https://localhost:8443/api/Comment/${payload.filmId}/${payload.pageNumber}/${payload.pageSize}`,
+    "get",
+  );
+}
+
+export function* commentPagesAmountRequest(payload) {
+  return yield call(
+    axiosDefault,
+    `https://localhost:8443/api/Comment/${payload.filmId}/${payload.pageSize}`,
     "get",
   );
 }
@@ -124,6 +132,16 @@ export function* commentDeleteRequest(payload, accessToken) {
     `https://localhost:8443/api/Comment/${payload}`,
     "delete",
     null,
+    accessToken,
+  );
+}
+
+export function* commentUpdateRequest(payload, accessToken) {
+  return yield call(
+    axiosDefault,
+    `https://localhost:8443/api/Comment`,
+    "put",
+    payload,
     accessToken,
   );
 }

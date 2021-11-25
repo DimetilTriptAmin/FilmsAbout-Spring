@@ -3,19 +3,37 @@ package by.karelin.webapi.controllers;
 import by.karelin.business.dto.Requests.ChangePasswordRequest;
 import by.karelin.business.dto.Requests.LoginRequest;
 import by.karelin.business.dto.Requests.RegisterRequest;
-import by.karelin.business.dto.Requests.UpdateRequest;
+import by.karelin.business.dto.Requests.UpdateAvatarRequest;
 import by.karelin.business.dto.Responses.*;
 import by.karelin.business.services.interfaces.IUserService;
 import by.karelin.business.utils.JwtProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "api/User")
 public class UserController {
     private final IUserService userService;
     private final JwtProvider jwtProvider;
+
+    /*
+    @Autowired
+    @Qualifier("loginRequestValidator") // spring validator
+    private Validator loginRequestValidator;
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(loginRequestValidator);
+    }*/
 
     public UserController(IUserService userService, JwtProvider jwtProvider) {
         this.userService = userService;
@@ -25,6 +43,10 @@ public class UserController {
     @GetMapping
     public ResponseEntity getUser(@RequestHeader("Authorization") String rawToken) {
         String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<UserResponse> response = userService.getById(userId);
@@ -39,9 +61,13 @@ public class UserController {
     @PutMapping(value = "/avatar")
     public ResponseEntity update(
             @RequestHeader("Authorization") String rawToken,
-            @RequestBody UpdateRequest updateData
+            @Valid @RequestBody UpdateAvatarRequest updateData
     ) {
         String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<UpdateAvatarResponse> response = userService.updateAvatar(userId, updateData);
@@ -54,7 +80,13 @@ public class UserController {
     }
 
     @PostMapping(value = "login")
-    public ResponseEntity login(@RequestBody LoginRequest loginData) {
+    public ResponseEntity login(@Valid @RequestBody LoginRequest loginData/*, BindingResult bindingResult*/) {
+
+        /*
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity("Model invalid", HttpStatus.BAD_REQUEST);
+        }*/
+
         ServiceResponse<LoginResponse> response = userService.loginUser(loginData);
 
         if (!response.IsSucceeded())
@@ -67,7 +99,7 @@ public class UserController {
     }
 
     @PostMapping(value = "register")
-    public ResponseEntity register(@RequestBody RegisterRequest registerData)
+    public ResponseEntity register(@Valid @RequestBody RegisterRequest registerData)
     {
         ServiceResponse<LoginResponse> response = userService.registerUser(registerData);
 
@@ -82,12 +114,16 @@ public class UserController {
     @PutMapping("password")
     public ResponseEntity changePassword(
             @RequestHeader("Authorization") String rawToken,
-            @RequestBody ChangePasswordRequest changePasswordRequest)
+            @Valid @RequestBody ChangePasswordRequest changePasswordRequest)
     {
         String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         Long userId = jwtProvider.getIdFromToken(token);
 
-        ServiceResponse<ChangePasswordResponse> response =
+        ServiceResponse<LoginResponse> response =
                 userService.changePassword(userId, changePasswordRequest);
 
         if (!response.IsSucceeded())

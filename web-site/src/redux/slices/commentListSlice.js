@@ -6,16 +6,25 @@ export const commentListSlice = createSlice({
     values: [],
     isLoading: true,
     Loaded: false,
+    page: 1,
+    pagesAmount: 0,
   },
   reducers: {
     COMMENTS_DATA_RESET: (state, action) => {
       state.isLoading = true;
       state.Loaded = false;
     },
+    COMMENT_LIST_REQUEST: (state, action) => {
+      state.isLoading = true;
+      state.page = action.payload.pageNumber;
+    },
     COMMENT_LIST_SUCCESS: (state, action) => {
       state.values = action.payload;
       state.Loaded = true;
       state.isLoading = false;
+    },
+    COMMENT_PAGES_AMOUNT_SUCCESS: (state, action) => {
+      state.pagesAmount = action.payload;
     },
     COMMENT_LIST_FAILURE: (state, action) => {
       state.isLoading = false;
@@ -28,6 +37,10 @@ export const commentListSlice = createSlice({
         (comment) => comment.id !== action.payload,
       );
     },
+    COMMENT_UPDATE_REQUEST: (state, action) => {
+      const $comment = state.values.find(comment => comment.id === action.payload.commentId)
+      $comment.text = action.payload.text
+    }
   },
 });
 

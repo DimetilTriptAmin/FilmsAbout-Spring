@@ -24,11 +24,11 @@ axios.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && error.config && isRetry) {
+    if (error.response.status === 401) {
       window.localStorage.removeItem("accessToken");
       window.location.href = "http://localhost:3000/login";
     }
-    if (error.response.status === 401 && error.config && !isRetry) {
+    else if (error.response.status === 401 && error.config && !isRetry) {
       try {
         isRetry = true;
         const response = await axiosDefault(

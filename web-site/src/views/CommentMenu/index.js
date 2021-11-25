@@ -2,7 +2,8 @@ import React from "react";
 import IconButton from "@material-ui/core/IconButton";
 import PropTypes from "prop-types";
 import MoreVert from "@material-ui/icons/MoreVert";
-import { Menu, MenuItem } from "@material-ui/core";
+import { Menu, MenuItem, Modal } from "@material-ui/core";
+import CommentInput from "../CommentInput";
 
 import useStyles from "./styles";
 
@@ -12,14 +13,18 @@ const CommentMenu = ({
   handleMenuClose,
   handleMenuOpen,
   deleteCommentClickHandler,
+  isEditing,
+  endEditing,
+  startEditing,
+  commentSubmitClickHandler,
 }) => {
   const classes = useStyles();
   return (
     <div className={classes.flex}>
       <IconButton
-        edge='end'
-        aria-haspopup='true'
-        color='inherit'
+        edge="end"
+        aria-haspopup="true"
+        color="inherit"
         onClick={handleMenuOpen}
       >
         <MoreVert style={{ color: "#fff" }} />
@@ -34,6 +39,9 @@ const CommentMenu = ({
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
+        <MenuItem className={classes.menuItem} onClick={startEditing}>
+          Edit
+        </MenuItem>
         <MenuItem
           className={classes.menuItem}
           onClick={deleteCommentClickHandler}
@@ -41,6 +49,16 @@ const CommentMenu = ({
           Delete
         </MenuItem>
       </Menu>
+
+      <Modal
+        open={isEditing}
+        onClose={endEditing}
+        aria-labelledby="Edit comment"
+      >
+        <div className={classes.modal}>
+          <CommentInput commentSubmitClick={commentSubmitClickHandler} />
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -7,8 +7,12 @@ import by.karelin.business.services.interfaces.IRatingService;
 import by.karelin.business.utils.JwtProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
+@Validated
 @RestController
 @RequestMapping(value = "api/Rating")
 public class RatingController {
@@ -26,6 +30,10 @@ public class RatingController {
             @PathVariable Long filmId
     ) {
         String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<RatingResponse> response = ratingService.getUserRating(userId, filmId);
@@ -38,10 +46,14 @@ public class RatingController {
 
     @PostMapping
     public ResponseEntity rateFilm(
-            @RequestBody SetRatingRequest setRatingRequest,
+            @Valid  @RequestBody SetRatingRequest setRatingRequest,
             @RequestHeader("Authorization") String rawToken
     ) {
         String token = rawToken.substring("Bearer ".length());
+        boolean Unauthorized =  !jwtProvider.validateToken(token);
+        if(Unauthorized){
+            return new ResponseEntity("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         Long userId = jwtProvider.getIdFromToken(token);
 
         ServiceResponse<Double> response =

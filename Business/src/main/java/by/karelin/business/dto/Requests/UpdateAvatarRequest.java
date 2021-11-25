@@ -1,6 +1,9 @@
 package by.karelin.business.dto.Requests;
 
-public class UpdateRequest {
+import javax.validation.constraints.NotBlank;
+
+public class UpdateAvatarRequest {
+    @NotBlank(message = "Avatar must not be blank or empty")
     private String avatar;
 
     public String getAvatar() {

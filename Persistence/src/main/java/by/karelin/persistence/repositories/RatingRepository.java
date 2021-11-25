@@ -31,19 +31,19 @@ public class RatingRepository implements IRatingRepository {
     }
 
     @Override
-    public Long setRating(int rate, Long filmId, Long userId) {
+    public Double setRating(int rate, Long filmId, Long userId) {
         StoredProcedureQuery query = entityManager
                 .createStoredProcedureQuery("sp_rating_set")
                 .registerStoredProcedureParameter(1, Integer.class, ParameterMode.IN)
                 .registerStoredProcedureParameter(2, Long.class, ParameterMode.IN)
                 .registerStoredProcedureParameter(3, Long.class, ParameterMode.IN)
-                .registerStoredProcedureParameter(4, Long.class, ParameterMode.OUT);
+                .registerStoredProcedureParameter(4, Double.class, ParameterMode.OUT);
         query.setParameter(1, rate);
         query.setParameter(2, filmId);
         query.setParameter(3, userId);
         query.execute();
 
-        Long resultId = (Long) query.getOutputParameterValue(4);
+        Double resultId = (Double) query.getOutputParameterValue(4);
 
         return resultId;
     }

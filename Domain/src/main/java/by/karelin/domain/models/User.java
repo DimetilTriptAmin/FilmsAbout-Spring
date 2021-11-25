@@ -1,5 +1,6 @@
 package by.karelin.domain.models;
 
+import by.karelin.domain.utils.enums.UserRole;
 import org.hibernate.annotations.Type;
 import org.hibernate.dialect.OracleTypesHelper;
 
@@ -13,6 +14,8 @@ public class User {
     private Long id;
     private String name;
     private String passwordHash;
+    @Column(name = "USER_ROLE")
+    private Integer userRole;
     @Lob
     private String avatar;
     private String email;
@@ -66,6 +69,15 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public Integer getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(Integer userRole) {
+        this.userRole = userRole;
+    }
+
 
     //endregion
 }

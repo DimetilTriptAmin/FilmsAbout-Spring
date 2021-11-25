@@ -9,12 +9,25 @@ import javax.persistence.ParameterMode;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
 import java.sql.Clob;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class UserRepository implements IUserRepository {
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Override
+    public List<String> getAllEmails() {
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("SP_USER_GET_EMAILS")
+                .registerStoredProcedureParameter(1, Class.class,
+                        ParameterMode.REF_CURSOR);
+        query.execute();
+
+        List<String> emails = query.getResultList();
+        return emails;
+    }
 
     @Override
     public User getById(Long id) {
@@ -86,6 +99,20 @@ public class UserRepository implements IUserRepository {
                 .registerStoredProcedureParameter(3, Long.class, ParameterMode.OUT);
         query.setParameter(1, id);
         query.setParameter(2, org.hibernate.engine.jdbc.NonContextualLobCreator.INSTANCE.createClob(avatar));
+        query.execute();
+
+        return (Long) query.getOutputParameterValue(3);
+    }
+
+    @Override
+    public Long changePassword(Long id, String passwordHash) {
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("SP_USER_UPDATE_PASSWORD")
+                .registerStoredProcedureParameter(1, Long.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(2, String.class, ParameterMode.IN)
+                .registerStoredProcedureParameter(3, Long.class, ParameterMode.OUT);
+        query.setParameter(1, id);
+        query.setParameter(2, passwordHash);
         query.execute();
 
         return (Long) query.getOutputParameterValue(3);

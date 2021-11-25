@@ -1,22 +1,26 @@
 package by.karelin.business.dto.Responses;
 
 
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
 public class ServiceResponse<TValue> {
     private TValue value;
     private String errorMessage;
+    private HttpStatus httpStatus;
 
     //region ctors
 
-    public ServiceResponse(TValue response)
+    public ServiceResponse(TValue response, HttpStatus httpStatus)
     {
         value = response;
+        this.httpStatus = httpStatus;
     }
 
-    public ServiceResponse(String message)
+    public ServiceResponse(String errorMessage, HttpStatus httpStatus)
     {
-        errorMessage = message;
+        this.errorMessage = errorMessage;
+        this.httpStatus = httpStatus;
     }
 
     //endregion
@@ -43,5 +47,13 @@ public class ServiceResponse<TValue> {
 
     public boolean IsSucceeded() {
         return !StringUtils.hasLength(errorMessage);
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    public void setHttpStatus(HttpStatus httpStatus) {
+        this.httpStatus = httpStatus;
     }
 }

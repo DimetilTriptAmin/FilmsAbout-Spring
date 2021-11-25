@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface ICommentRepository {
     Long createComment(Comment comment);
+    Long updateComment(Long id, Long userId, String text);
     Long deleteComment(Long id, Long userId);
-    List<CommentViewModel> getAllByFilmId(Long filmId);
+    List<CommentViewModel> getCommentPage(Long filmId, Integer pageNumber, Integer pageSize);
+    List<CommentViewModel> getDeletedCommentPage(Long filmId, Integer pageNumber, Integer pageSize);
+    Integer getCommentPagesAmount(Long filmId, Integer pageSize);
 }

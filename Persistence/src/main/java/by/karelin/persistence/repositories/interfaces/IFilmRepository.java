@@ -7,5 +7,4 @@ public interface IFilmRepository {
     List<Film> getAll();
     Film getById(Long id);
     Long getIdByTitle(String title);
-    Double updateRating(Long id);
 }

@@ -29,9 +29,10 @@ const FilmCard = ({ title, rating, poster, description, handleClick }) => {
           image={`data:image/jpeg;base64,${poster}`}
         />
         <CardContent className={classes.cardContent}>
-          <Typography variant='body2' component='div'>
+          <Typography variant='body2' className={classes.cardContentText}>
             {description}
           </Typography>
+          ...
         </CardContent>
         <CardActions>
           <Button className={classes.button} onClick={handleClick}>
